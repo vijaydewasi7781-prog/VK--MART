@@ -1,2 +1,2 @@
 # VK--MART
-buy anything easily
+Buy anything easily

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Sample Store</title>
+    
+    <style>
+        :root {
+            --primary-color: #ff4757;
+            --bg-color: #f1f2f6;
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .cart-icon {
+            font-size: 18px;
+            font-weight: bold;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* Responsive hone ke liye (Mobile layout) */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            margin: 10px 0 5px 0;
+        }
+
+        .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2ed573;
+            margin: 0 0 15px 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .add-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .add-btn:hover {
+            background-color: #ff6b81;
+        }
+
+        .cart-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .cart-section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #f1f2f6;
+            padding-bottom: 10px;
+        }
+
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .qty-btn {
+            background: #e4e7eb;
+            padding: 2px 8px;
+            font-size: 14px;
+        }
+
+        .qty-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .delete-btn {
+            background: none;
+            color: #ff4757;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .total-box {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .checkout-btn {
+            background-color: #2ed573;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .checkout-btn:hover {
+            background-color: #26af5f;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚡ TrendyStore</h1>
+        <div class="cart-icon">🛒 Cart (<span id="cart-count">0</span>)</div>
+    </header>
+
+    <div class="container">
+        
+        <main class="products-grid" id="products-container">
+            </main>
+
+        <section class="cart-section">
+            <h2>Your Shopping Cart</h2>
+            <div id="cart-items">
+                </div>
+            
+            <div class="total-box">
+                <span>Total Amount:</span>
+                <span>₹<span id="cart-total">0</span></span>
+            </div>
+            
+            <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
+        </section>
+
+    </div>
+
+    <script>
+        // 1. Aapke Products ki list (Aap yahan naye items jod sakte ho)
+        const products = [
+            { id: 1, name: "Premium Anime Hoodie", price: 1499, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500" },
+            { id: 2, name: "RGB Mechanical Keyboard", price: 3499, image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500" },
+            { id: 3, name: "Minimalist Desk Mat", price: 799, image: "https://images.unsplash.com/photo-1632292224971-0d45778bd364?w=500" }
+        ];
+
+        // Browser localStorage se purani cart uthao taaki page refresh par data na ude
+        let cart = JSON.parse(localStorage.getItem('single_page_cart')) || [];
+
+        const productsContainer = document.getElementById('products-container');
+
+        // 2. Products ko screen par render karna
+        function displayProducts() {
+            productsContainer.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p class="price">₹${product.price}</p>
+                    <button onclick="addToCart(${product.id})" class="add-btn">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        // 3. FEATURE WORKING: Add to Cart (Quantity automatic handles)
+        window.addToCart = function(productId) {
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                const product = products.find(p => p.id === productId);
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            saveAndRefresh();
+        };
+
+        // 4. FEATURE WORKING: Quantity badhane/ghatane ke liye (+/-)
+        window.changeQuantity = function(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                    return;
+                }
+            }
+            saveAndRefresh();
+        };
+
+        // 5. FEATURE WORKING: Cart se item delete karna (Trash box)
+        window.removeFromCart = function(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveAndRefresh();
+        };
+
+        // Data ko local storage me save karna aur UI badalna
+        function saveAndRefresh() {
+            localStorage.setItem('single_page_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        // 6. FEATURE WORKING: Real-time calculation aur Cart Update
+        function updateCartUI() {
+            // Header badge count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').innerText = totalItems;
+            
+            const cartItemsElement = document.getElementById('cart-items');
+            
+            if (cart.length === 0) {
+                cartItemsElement.innerHTML = `<p style="color: #888; text-align: center; padding: 20px 0;">Your cart is empty... 🛒</p>`;
+            } else {
+                cartItemsElement.innerHTML = cart.map(item => `
+                    <div class="cart-item-row">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <span style="color: #777; font-size: 14px;">₹${item.price} x ${item.quantity}</span>
+                        </div>
+                        <div>
+                            <button onclick="changeQuantity(${item.id}, -1)" class="qty-btn">-</button>
+                            <span style="margin: 0 5px; font-weight: bold;">${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)" class="qty-btn">+</button>
+                            <button onclick="removeFromCart(${item.id})" class="delete-btn">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Grand total calculate karna
+            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cart-total').innerText = totalAmount;
+        }
+
+        // 7. 🔥 ONLY THIS IS COMING SOON: Checkout Button Alert
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert("Arey bhai! Pehle cart me kuch saman toh add karo! 🛒");
+            } else {
+                alert("🚀 Order Coming Soon!\n\nThank you for testing our sample store! We are launching online orders very soon. Your cart demo works perfectly! 😎");
+            }
+        });
+
+        // App start hote hi pehli baar data load karne ke liye
+        displayProducts();
+        updateCartUI();
+    </script>
+</body>
+</html>
